@@ -1,19 +1,23 @@
 package com.xtu.plugin.github.ui;
 
+import com.intellij.ide.BrowserUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
 import com.xtu.plugin.github.entity.TrendingItem;
+import com.xtu.plugin.github.utils.StringUtils;
 import icons.PluginIcons;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-public class TrendingItemView extends JComponent {
+public class TrendingItemView extends JPanel {
 
     private static final int sIconTextGap = 5;
     private static final int sFootItemMargin = 15;
-    private static final float sCommonTextSize = 12f;
-    private static final float sHeaderTextSize = 14f;
+    private static final float sCommonTextSize = 15f;
+    private static final float sHeaderTextSize = 18f;
 
     private JLabel userNameView;
     private JLabel repoNameView;
@@ -24,6 +28,7 @@ public class TrendingItemView extends JComponent {
     private JLabel dailyStarView;
 
     public TrendingItemView() {
+        setBorder(JBUI.Borders.compound(JBUI.Borders.customLineBottom(JBColor.GRAY), JBUI.Borders.empty(16)));
         setLayout(new BorderLayout());
         Box verticalBox = Box.createVerticalBox();
         verticalBox.add(createHeadView());
@@ -52,6 +57,7 @@ public class TrendingItemView extends JComponent {
         this.descView = new JTextArea();
         this.descView.setEditable(false);
         this.descView.setLineWrap(true);
+        this.descView.setEnabled(false);
         this.descView.setWrapStyleWord(true);
         this.descView.setBackground(new Color(0, 0, 0, 0));
         this.descView.setBorder(JBUI.Borders.empty(10, 21, 10, 10));
@@ -68,7 +74,7 @@ public class TrendingItemView extends JComponent {
         horizontalBox.add(this.starView = createFootItemView(PluginIcons.star));
         horizontalBox.add(Box.createHorizontalStrut(sFootItemMargin));
         horizontalBox.add(this.forkView = createFootItemView(PluginIcons.fork));
-        horizontalBox.add(Box.createHorizontalGlue());
+        horizontalBox.add(Box.createHorizontalStrut(sFootItemMargin));
         horizontalBox.add(this.dailyStarView = createFootItemView(PluginIcons.star));
         return horizontalBox;
     }
@@ -89,5 +95,15 @@ public class TrendingItemView extends JComponent {
         this.starView.setText(item.getStarNum());
         this.forkView.setText(item.getForkNum());
         this.dailyStarView.setText(item.getDailyStar());
+        MouseAdapter mouseClickListener = new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                String url = item.getUrl();
+                if (StringUtils.isEmpty(url)) return;
+                BrowserUtil.open(url);
+            }
+        };
+        this.descView.addMouseListener(mouseClickListener);
+        this.addMouseListener(mouseClickListener);
     }
 }

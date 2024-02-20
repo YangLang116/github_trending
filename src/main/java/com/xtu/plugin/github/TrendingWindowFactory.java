@@ -10,7 +10,7 @@ import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
 import com.xtu.plugin.github.action.LanguageAction;
 import com.xtu.plugin.github.action.RefreshAction;
-import com.xtu.plugin.github.ui.TrendingListView;
+import com.xtu.plugin.github.ui.TrendingDataView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -22,15 +22,15 @@ public class TrendingWindowFactory implements ToolWindowFactory, DumbAware {
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         ContentManager contentManager = toolWindow.getContentManager();
         ContentFactory factory = contentManager.getFactory();
-        TrendingListView trendingListView = new TrendingListView();
-        Content content = factory.createContent(trendingListView, "", true);
+        TrendingDataView dataView = new TrendingDataView();
+        Content content = factory.createContent(dataView, "", true);
         contentManager.addContent(content);
         toolWindow.setAutoHide(true);
-        toolWindow.setTitleActions(createTitleActions(trendingListView));
-        trendingListView.refreshData();
+        toolWindow.setTitleActions(createTitleActions(dataView));
+        dataView.refreshData();
     }
 
-    private List<AnAction> createTitleActions(@NotNull TrendingListView listView) {
-        return Arrays.asList(new RefreshAction(listView), new LanguageAction(listView));
+    private List<AnAction> createTitleActions(@NotNull TrendingDataView dataView) {
+        return Arrays.asList(new RefreshAction(dataView), new LanguageAction(dataView));
     }
 }

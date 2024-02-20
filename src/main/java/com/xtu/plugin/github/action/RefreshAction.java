@@ -3,20 +3,20 @@ package com.xtu.plugin.github.action;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.xtu.plugin.github.ui.TrendingListView;
+import com.xtu.plugin.github.ui.TrendingDataView;
 import org.jetbrains.annotations.NotNull;
 
 public class RefreshAction extends AnAction {
 
-    private final TrendingListView listView;
+    private final TrendingDataView dataView;
 
-    public RefreshAction(@NotNull TrendingListView listView) {
-        super(AllIcons.Actions.Refresh);
-        this.listView = listView;
+    public RefreshAction(@NotNull TrendingDataView dataView) {
+        super("Refresh", "Refresh", AllIcons.Actions.Refresh);
+        this.dataView = dataView;
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-        this.listView.refreshData();
+        this.dataView.refreshData();
     }
 }
