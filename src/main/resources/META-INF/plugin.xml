@@ -1,18 +1,16 @@
-<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.yanglang116.githubtrending</id>
-    <name>github_trending Template</name>
-    <vendor>yanglang116</vendor>
+    <id>com.xtu.plugins.github.trending</id>
+    <name>Github-Trending</name>
+    <vendor email="yanglang116@gmail.com">yanglang116@gmail.com</vendor>
+    <idea-version since-build="211"/>
 
     <depends>com.intellij.modules.platform</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
-
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.yanglang116.githubtrending.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+        <toolWindow id="Github Trending"
+                    icon="AllIcons.Vcs.Vendors.Github"
+                    anchor="right"
+                    secondary="false"
+                    factoryClass="com.xtu.plugin.github.TrendingWindowFactory"/>
     </extensions>
-
-    <applicationListeners>
-        <listener class="com.github.yanglang116.githubtrending.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
 </idea-plugin>

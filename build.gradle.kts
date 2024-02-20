@@ -1,6 +1,7 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.date
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
@@ -17,6 +18,10 @@ version = properties("pluginVersion").get()
 
 repositories {
     mavenCentral()
+}
+
+dependencies {
+    implementation("org.jsoup:jsoup:1.10.2")
 }
 
 kotlin {
@@ -38,13 +43,22 @@ intellij {
 changelog {
     version = properties("pluginVersion")
     path = file("CHANGELOG.md").canonicalPath
-    header = "[$version] - ${date()}"
-    itemPrefix = "-"
-    keepUnreleasedSection = false
-    repositoryUrl = properties("pluginRepositoryUrl")
+    header = "${properties("pluginVersion").get()}/${date()}"
+    keepUnreleasedSection = true
+    groups = mutableListOf("Changed")
+    itemPrefix = "#"
 }
 
 tasks {
+    properties("javaVersion").get().let {
+        withType<JavaCompile> {
+            sourceCompatibility = it
+            targetCompatibility = it
+        }
+        withType<KotlinCompile> {
+            kotlinOptions.jvmTarget = it
+        }
+    }
     wrapper {
         gradleVersion = properties("gradleVersion").get()
     }
