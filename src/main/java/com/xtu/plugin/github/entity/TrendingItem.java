@@ -11,7 +11,7 @@ public class TrendingItem {
     private String url;
 
     public String getUserName() {
-        return userName;
+        return userName == null || userName.isEmpty() ? "-" : userName;
     }
 
     public void setUserName(String userName) {
@@ -19,7 +19,7 @@ public class TrendingItem {
     }
 
     public String getRepoName() {
-        return repoName;
+        return repoName == null || repoName.isEmpty() ? "-" : repoName;
     }
 
     public void setRepoName(String repoName) {
@@ -27,7 +27,7 @@ public class TrendingItem {
     }
 
     public String getRepoDesc() {
-        return repoDesc;
+        return repoDesc == null || repoDesc.isEmpty() ? "-" : repoDesc;
     }
 
     public void setRepoDesc(String repoDesc) {
@@ -35,7 +35,7 @@ public class TrendingItem {
     }
 
     public String getStarNum() {
-        return starNum;
+        return starNum == null || starNum.isEmpty() ? "-" : starNum;
     }
 
     public void setStarNum(String starNum) {
@@ -43,7 +43,7 @@ public class TrendingItem {
     }
 
     public String getForkNum() {
-        return forkNum;
+        return forkNum == null || forkNum.isEmpty() ? "-" : forkNum;
     }
 
     public void setForkNum(String forkNum) {
@@ -51,7 +51,7 @@ public class TrendingItem {
     }
 
     public String getLanguage() {
-        return language;
+        return language == null || language.isEmpty() ? "-" : language;
     }
 
     public void setLanguage(String language) {
@@ -59,7 +59,7 @@ public class TrendingItem {
     }
 
     public String getDailyStar() {
-        return dailyStar;
+        return dailyStar == null || dailyStar.isEmpty() ? "-" : dailyStar;
     }
 
     public void setDailyStar(String dailyStar) {

@@ -3,7 +3,6 @@ package com.xtu.plugin.github.ui;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
 import com.xtu.plugin.github.entity.TrendingItem;
-import com.xtu.plugin.github.utils.StringUtils;
 import icons.PluginIcons;
 
 import javax.swing.*;
@@ -85,7 +84,7 @@ public class TrendingItemView extends JComponent {
     public void bindData(TrendingItem item) {
         this.userNameView.setText(item.getUserName() + " / ");
         this.repoNameView.setText(item.getRepoName());
-        this.descView.setText(StringUtils.fix(item.getRepoDesc(), "-"));
+        this.descView.setText(item.getRepoDesc());
         this.languageView.setText(item.getLanguage());
         this.starView.setText(item.getStarNum());
         this.forkView.setText(item.getForkNum());
