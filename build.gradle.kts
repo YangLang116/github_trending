@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jsoup:jsoup:1.10.2")
+    implementation("org.jsoup:jsoup:1.17.2")
 }
 
 kotlin {
