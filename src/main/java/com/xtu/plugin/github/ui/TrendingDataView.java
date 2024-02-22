@@ -17,14 +17,15 @@ public class TrendingDataView extends JPanel {
     private String language = "";
     private final TrendingDataFetcher fetcher;
     private final Box listView;
-    private final JLabel emptyView;
+    private final JLabel tipView;
 
     public TrendingDataView() {
         this.setLayout(new BorderLayout());
         this.fetcher = new TrendingDataFetcher();
         this.listView = Box.createVerticalBox();
-        this.emptyView = new JLabel();
-        this.emptyView.setFont(new Font(null, Font.PLAIN, JBUI.scaleFontSize(15f)));
+        this.tipView = new JLabel();
+        this.tipView.setHorizontalAlignment(SwingConstants.CENTER);
+        this.tipView.setFont(new Font(null, Font.PLAIN, JBUI.scaleFontSize(15f)));
     }
 
     public void setLanguage(String language) {
@@ -34,24 +35,34 @@ public class TrendingDataView extends JPanel {
     }
 
     public void refreshData() {
+        showTipView("Loading Data...");
         this.fetcher.fetch(UrlConstant.TRENDING_URL + language, new TrendingDataFetcher.OnResultListener() {
             @Override
             public void onSuccess(@NotNull List<TrendingItem> list) {
-                removeAll();
-                for (TrendingItem item : list) {
-                    TrendingItemView itemView = new TrendingItemView();
-                    itemView.bindData(item);
-                    listView.add(itemView);
-                }
-                add(new JBScrollPane(listView), BorderLayout.CENTER);
+                showListView(list);
             }
 
             @Override
             public void onFail(@NotNull String error) {
-                removeAll();
-                emptyView.setText(error);
-                add(emptyView, BorderLayout.CENTER);
+                showTipView(error);
             }
         });
+    }
+
+    private void showListView(@NotNull List<TrendingItem> list) {
+        removeAll();
+        this.listView.removeAll();
+        for (TrendingItem item : list) {
+            TrendingItemView itemView = new TrendingItemView();
+            itemView.bindData(item);
+            listView.add(itemView);
+        }
+        add(new JBScrollPane(this.listView), BorderLayout.CENTER);
+    }
+
+    private void showTipView(@NotNull String error) {
+        removeAll();
+        this.tipView.setText(error);
+        add(this.tipView, BorderLayout.CENTER);
     }
 }
