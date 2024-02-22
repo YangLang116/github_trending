@@ -1,5 +1,5 @@
 <!-- Plugin description -->
-Trending repositories on GitHub today ~~~~~
+You can browse and search Github Trending in Idea without opening a browser
 <!-- Plugin description end -->
 
 ## ScreenShot
