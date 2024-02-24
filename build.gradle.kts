@@ -43,7 +43,7 @@ intellij {
 changelog {
     version = properties("pluginVersion")
     path = file("CHANGELOG.md").canonicalPath
-    header = "${properties("pluginVersion").get()}/${date()}"
+    header = "${properties("pluginVersion").get()} / ${date()}"
     keepUnreleasedSection = true
     groups = mutableListOf("Changed")
     itemPrefix = "#"

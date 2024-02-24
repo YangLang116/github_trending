@@ -4,6 +4,6 @@
 
 ### Changed
 
-## 1.0.0/2024-02-19
+## 1.0.1 / 2024-02-23
 
-123
+browse and search Github-Trending
