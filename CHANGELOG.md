@@ -1,9 +1,7 @@
 # Changelog
 
-## Unreleased
+## [Coming]
 
-### Changed
+## 1.0.1
 
-## 1.0.1 / 2024-02-23
-
-browse and search Github-Trending
+- browse and search Github-Trending

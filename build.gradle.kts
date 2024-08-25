@@ -1,72 +1,49 @@
 import org.jetbrains.changelog.Changelog
-import org.jetbrains.changelog.date
 import org.jetbrains.changelog.markdownToHTML
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-fun properties(key: String) = providers.gradleProperty(key)
-fun environment(key: String) = providers.environmentVariable(key)
 
 plugins {
-    id("java") // Java support
-    alias(libs.plugins.kotlin) // Kotlin support
-    alias(libs.plugins.gradleIntelliJPlugin) // Gradle IntelliJ Plugin
-    alias(libs.plugins.changelog) // Gradle Changelog Plugin
+    id("java")
+    id("org.jetbrains.changelog") version "2.2.1"
+    id("org.jetbrains.intellij.platform") version "2.0.1"
 }
-
-group = properties("pluginGroup").get()
-version = properties("pluginVersion").get()
 
 repositories {
     mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation("org.jsoup:jsoup:1.17.2")
-}
 
-kotlin {
-    @Suppress("UnstableApiUsage")
-    jvmToolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-        vendor = JvmVendorSpec.JETBRAINS
+    intellijPlatform {
+        create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
+        bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
+        plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
+
+        instrumentationTools()
+        pluginVerifier()
+        zipSigner()
     }
-}
-
-intellij {
-    pluginName = properties("pluginName")
-    type = properties("platformType")
-    version = properties("platformVersion")
-    plugins = properties("platformPlugins").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }
-    updateSinceUntilBuild = false
 }
 
 changelog {
-    version = properties("pluginVersion")
-    path = file("CHANGELOG.md").canonicalPath
-    header = "${properties("pluginVersion").get()} / ${date()}"
-    keepUnreleasedSection = true
-    groups = mutableListOf("Changed")
-    itemPrefix = "#"
+    version.set(providers.gradleProperty("pluginVersion"))
+    path.set(file("CHANGELOG.md").canonicalPath)
+    header.set(provider { "[${version.get()}]" })
+    headerParserRegex.set("""(\d+\.\d+\.\d+)""".toRegex())
+    itemPrefix.set("-")
+    keepUnreleasedSection.set(true)
+    unreleasedTerm.set("[Coming]")
+    groups.set(listOf(""))
 }
 
-tasks {
-    properties("javaVersion").get().let {
-        withType<JavaCompile> {
-            sourceCompatibility = it
-            targetCompatibility = it
-        }
-        withType<KotlinCompile> {
-            kotlinOptions.jvmTarget = it
-        }
-    }
-    wrapper {
-        gradleVersion = properties("gradleVersion").get()
-    }
-
-    patchPluginXml {
-        version = properties("pluginVersion")
-        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-        pluginDescription = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
+intellijPlatform {
+    pluginConfiguration {
+        version = providers.gradleProperty("pluginVersion")
+        description = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
             val start = "<!-- Plugin description -->"
             val end = "<!-- Plugin description end -->"
 
@@ -77,9 +54,12 @@ tasks {
                 subList(indexOf(start) + 1, indexOf(end)).joinToString("\n").let(::markdownToHTML)
             }
         }
-        val changelog = project.changelog // local variable for configuration cache compatibility
-        // Get the latest available change notes from the changelog file
-        changeNotes = properties("pluginVersion").map { pluginVersion ->
+        ideaVersion {
+            sinceBuild = providers.gradleProperty("pluginSinceBuild")
+            untilBuild = provider { null }
+        }
+        val changelog = project.changelog
+        changeNotes = providers.gradleProperty("pluginVersion").map { pluginVersion ->
             with(changelog) {
                 renderItem(
                         (getOrNull(pluginVersion) ?: getUnreleased())
@@ -90,21 +70,39 @@ tasks {
             }
         }
     }
+    signing {
+        certificateChainFile.set(project.file("profiles/chain.crt"))
+        privateKeyFile.set(project.file("profiles/private.pem"))
+        password.set(providers.environmentVariable("PRIVATE_KEY_PASSWORD"))
+    }
+    publishing {
+        token = providers.environmentVariable("PUBLISH_TOKEN")
+        channels = providers.gradleProperty("pluginVersion").map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
+    }
+    pluginVerification {
+        ides {
+            recommended()
+        }
+    }
+}
 
-    signPlugin {
-        certificateChainFile = project.file("profiles/chain.crt")
-        privateKeyFile = project.file("profiles/private.pem")
-        password = environment("PRIVATE_KEY_PASSWORD")
+intellijPlatformTesting {
+    runIde {
+        register("runOnAndroidStudio") {
+            localPath = file(providers.gradleProperty("idePath"))
+            prepareSandboxTask {
+                sandboxDirectory = project.layout.buildDirectory.dir("sandbox-as")
+            }
+        }
+    }
+}
+
+tasks {
+    wrapper {
+        gradleVersion = providers.gradleProperty("gradleVersion").get()
     }
 
     publishPlugin {
-        dependsOn("patchChangelog")
-        token = environment("PUBLISH_TOKEN")
-        channels = properties("pluginVersion").map { listOf(it.split('-').getOrElse(1) { "default" }.split('.').first()) }
-    }
-
-    runIde {
-        jbrVersion = "11_0_10b1145.115"
-        ideDir = file(properties("idePath"))
+        dependsOn(patchChangelog)
     }
 }
